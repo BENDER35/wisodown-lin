@@ -33,11 +33,11 @@ wisodown
 ```
 
 系统会提示你选择：
-1. **Windows 版本** — Windows 11 x64、Windows 11 arm64、Windows 11 家庭版/专业版（中国版）或 Windows 10
-2. **语言** — 微软提供的所有语言（默认为英语）
-3. **架构**（仅 Windows 10）— 64 位或 32 位
+1. **Windows 版本** — Windows 11 x64、Windows 11 arm64、Windows 11 家庭版/专业版（中国版）、Windows 10，或来自 archive.org 的 Windows 7 / 8 / 8.1
+2. **语言** — 微软提供的所有语言（默认为英语）；Windows 8.1 则从 archive.org 的语言中选择
+3. **架构**（Windows 10 及旧版版本）— 64 位或 32 位
 
-ISO 文件将下载到当前目录。SHA-256 哈希值会自动从微软页面获取，并与下载文件进行校验。
+ISO 文件将下载到当前目录。SHA-256 哈希值会自动从微软页面获取并与下载文件校验；Windows 7/8/8.1 则对照 archive.org 的 MD5 校验。Windows 7/8 支持中英文。
 
 ## 非交互式下载
 
@@ -49,6 +49,12 @@ wisodown --edition x64 --language English
 
 # Windows 10，法语，保存到 ~/Downloads
 wisodown --edition win10 --language French --output ~/Downloads
+
+# Windows 7 Ultimate SP1（archive.org），英语
+wisodown --edition win7 --language English
+
+# Windows 7 Ultimate SP1（archive.org），西班牙语/Spanish
+wisodown --edition win7 --language Spanish
 ```
 
 ## 运行效果

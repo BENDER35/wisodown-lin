@@ -25,7 +25,7 @@ pub struct LegacyEdition {
 pub const LEGACY_EDITIONS: &[LegacyEdition] = &[
     LegacyEdition {
         aliases: &["win7", "windows7", "7"],
-        label: "Windows 7 Ultimate SP1 (English)",
+        label: "Windows 7 Ultimate SP1 (multi-language)",
         items: &["win7-ult-sp1-english"],
     },
     LegacyEdition {

@@ -2,13 +2,14 @@
 
 **English** · [Español](README.es.md)
 
-Download Windows 10 and Windows 11 ISOs directly from Microsoft's servers — no Media Creation Tool, no browser required.
+Download Windows 10 and Windows 11 ISOs directly from Microsoft's servers — plus Windows 7, 8 and 8.1 from archive.org — no Media Creation Tool, no browser required.
 
 ## Features
 
 - Downloads ISOs straight from Microsoft's official CDN
 - Supports **Windows 10** (multi-edition: Home/Pro, 32-bit and 64-bit)
 - Supports **Windows 11 x64** and **Windows 11 arm64**
+- Supports **Windows 7, 8 and 8.1** from **[archive.org](https://archive.org)** (Microsoft no longer publishes those consumer ISOs)
 - **Raw edition ID support** — pass any numeric `ProductEditionId` from Microsoft's API
 - **SHA-256 verification** — hash is computed while streaming and printed after download; pass `--verify` to fail on mismatch
 - Interactive wizard when run without arguments
@@ -25,12 +26,21 @@ Download Windows 10 and Windows 11 ISOs directly from Microsoft's servers — no
 | `win10` | Windows 10 **22H2** | x86 (32-bit) **and** x64 (64-bit) | `Win10_22H2_<Lang>_x32v1.iso` / `Win10_22H2_<Lang>_x64v1.iso` |
 | `win11-cn-home` | Windows 11 **25H2** Home (China) | — | Chinese (Simplified) only |
 | `win11-cn-pro` | Windows 11 **25H2** Pro (China) | — | Chinese (Simplified) only |
+| `win7` | Windows 7 **Ultimate SP1** — archive.org | x86 (32-bit) **and** x64 (64-bit) | `Win7_Ult_SP1_English_x32.iso` / `Win7_Ult_SP1_Spanish_x32.iso` / `..._x64.iso` / `..._x64.es.iso` |
+| `win8` | Windows 8 **RTM** — archive.org | x86 (32-bit) **and** x64 (64-bit) | `en_windows_8_x86_dvd_915417.iso` / `..._x64_...iso` |
+| `win8.1` | Windows 8.1 **Home/Pro** — archive.org | x86 (32-bit) **and** x64 (64-bit) | `Win8.1_<Lang>_x32.iso` / `Win8.1_<Lang>_x64.iso` |
 
 - ISOs are **multi-edition** (Home/Pro/Edu/…): your product key selects the edition during installation.
 - **38 languages** are available for Windows 10/11 (x64 and Arm64).
 - Windows 11 has **no 32-bit** ISO; Windows 10 lets you choose **32-bit or 64-bit**.
 - Enterprise **LTSC / IoT** images are *not* on Microsoft's public download pages.
 - Any other product: pass its numeric `ProductEditionId` with `--edition-id`.
+- **Windows 7 / 8 / 8.1 are served from [archive.org](https://archive.org)**, not
+  Microsoft: those consumer ISOs were retired from Microsoft's public pages.
+  `win8.1` is **multi-language**; `win7`/`win8` support **English and Spanish**
+  (Spanish ISOs are available via archive.org). The file list is read from the
+  archive.org metadata API at runtime, and downloads are verified against the
+  **MD5** published there (`--verify` still accepts a SHA-256).
 
 ## Requirements
 
@@ -99,8 +109,8 @@ cargo build --release --target i686-pc-windows-msvc
 
 **Host OS** support: **Windows 10 and Windows 11** — x64, ARM64 and 32-bit x86
 (`i686`). Windows 7/8.1 are not supported by current Rust toolchains. (This is
-about *where the binary runs* — the ISOs it downloads are Windows 10/11; see
-[What you can download](#what-you-can-download).)
+about *where the binary runs* — the ISOs it downloads are Windows 7/8/8.1/10/11;
+see [What you can download](#what-you-can-download).)
 
 > **Prebuilt releases:** each release ships ready-to-run archives:
 > `wisodown-linux-x86_64.zip`, `wisodown-macos-*.zip`,
@@ -160,6 +170,43 @@ wisodown --edition win10 --language English
 wisodown --edition x64 --language English --output ~/Downloads
 ```
 
+### Legacy editions — Windows 7 / 8 / 8.1 (archive.org)
+
+Microsoft no longer publishes the consumer Windows 7 / 8 / 8.1 ISOs, so these
+editions are downloaded from **[archive.org](https://archive.org)** instead:
+
+```sh
+# Windows 7 Ultimate SP1, 64-bit (Spanish)
+wisodown --edition win7 --language Spanish
+
+# Windows 7 Ultimate SP1, 64-bit (English)
+wisodown --edition win7 --language English
+
+# Windows 8 RTM, 32-bit (English)
+wisodown --edition win8 --language English
+
+# Windows 8 RTM, 64-bit (English)
+wisodown --edition win8 --language English
+
+# Windows 8.1 — pick a language; both 32-bit and 64-bit are offered
+wisodown --edition win8.1 --language Spanish
+
+# See every ISO available for an edition
+wisodown --edition win8.1 --list-languages
+
+# Just print the archive.org URL
+wisodown --edition win7 --language English --url-only
+```
+
+For `--language`, `win8.1` uses the language embedded in the filename
+(`Spanish`, `German`, `Chinese(Simplified)`, …); an exact match wins, otherwise
+it falls back to a substring match. `win7` and `win8` support **English and Spanish**
+(Spanish ISOs are available via archive.org).
+
+> These are **community mirrors** hosted by the Internet Archive, not
+> Microsoft-operated servers. Downloads are verified against the MD5 published
+> by archive.org.
+
 ### Raw edition IDs
 
 Pass any numeric `ProductEditionId` directly, bypassing the named aliases:
@@ -187,9 +234,13 @@ wisodown --edition-id 2618 \
 | `win10` | Windows 10 22H2, multi-edition (prompts 32-bit vs 64-bit)       |
 | `win11-cn-home` | Windows 11 25H2 Home (China, Chinese Simplified only)   |
 | `win11-cn-pro`  | Windows 11 25H2 Pro (China, Chinese Simplified only)    |
+| `win7`          | Windows 7 Ultimate SP1, English and Spanish (**archive.org**)        |
+| `win8`          | Windows 8 RTM, English (**archive.org**)                 |
+| `win8.1`        | Windows 8.1 Home/Pro, multi-language (**archive.org**)   |
 
 Aliases `win11`, `win11-x64`, `win11-arm64`, `amd64`, `aarch64`, `cn-home` and
-`cn-pro` are also accepted.
+`cn-pro` are also accepted. The legacy editions also accept `windows7`,
+`windows8`, `windows8.1`, `win81`, `windows81` and the bare `7`, `8`, `8.1`.
 
 ### Hash verification
 
@@ -244,6 +295,11 @@ Prints all API requests, responses, and cookie exchange steps to stderr.
 3. Calls `getSkuInformationByProductEdition` to list available language SKUs
 4. Calls `GetProductDownloadLinksBySku` to get a time-limited CDN link
 5. Streams the ISO to disk, computing SHA-256 on the fly, with a progress bar
+
+For the legacy **Windows 7 / 8 / 8.1** editions there is no Microsoft API call:
+the tool queries the **archive.org metadata API** for the ISO list (names, sizes,
+MD5) and downloads from `https://archive.org/download/<item>/<file>`, reusing the
+same multi-threaded downloader and checking the archive.org MD5.
 
 ## Documentation
 

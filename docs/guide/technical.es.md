@@ -84,7 +84,7 @@ dependencia nativa de compilación que queda es un compilador de C, necesario pa
 | `get_skus(edition_id)` | Llama a `getSkuInformationByProductEdition`, devuelve `Vec<Sku>`. |
 | `get_download_links(sku_id)` | Llama a `GetProductDownloadLinksBySku`, devuelve `DownloadResponse`. |
 | `fetch_page_hashes()` | Raspa la tabla de SHA-256 de la página. |
-| `download_file(url, path, threads, hash)` | Solo nativo; ver `download.rs`. |
+| `download_file(url, path, threads, hash)` | Solo nativo; delega en `download.rs::download_url`. |
 
 El cliente usa un `User-Agent` fijo de Chrome sobre Windows para la petición de
 la *página*. Es intencionado — Microsoft redirige los UA de Windows a la Media
@@ -128,6 +128,32 @@ y 64 bits `x64`); la CLI muestra un prompt `Select download` cuando hay más de
 una opción (`x64`/`arm64` devuelven una sola). Hay 38 idiomas disponibles para
 Windows 10 y para Windows 11 x64/Arm64.
 
+### `legacy.rs`
+
+Conecta las ediciones **Windows 7 / 8 / 8.1** con **archive.org**, ya que Microsoft
+dejó de publicar esas ISOs de consumidor (su página `windows7ISO` solo muestra un
+aviso de fin de soporte, y `GetProductDownloadLinksBySku` solo conoce productos
+actuales).
+
+- Una tabla curada (`LEGACY_EDITIONS`) asocia los alias a identificadores de
+  archive.org: `win7` → `win7-ult-sp1-english`, `win8` → `Win8_RTM_MSDN_English`,
+  `win8.1` → `win-8.1`.
+- `collect_isos()` consulta `https://archive.org/metadata/<item>` en tiempo de
+  ejecución y devuelve cada fichero `.iso` con su tamaño y MD5 (así la lista se
+  mantiene sincronizada con archive.org).
+- `LegacyIso::url()` construye `https://archive.org/download/<item>/<file>` (con
+  codificación porcentual de los segmentos).
+- `language_from_filename()` / `arch_from_filename()` derivan una etiqueta legible
+  del nombre (`Win8.1_<Idioma>_x{32,64}.iso` o el prefijo ISO-639 en
+  `en_windows_8_x64_…iso`); `filter_by_language()` hace coincidencia exacta y,
+  si no, por subcadena. El código admite el código de idioma español (`es`).
+- Las descargas reutilizan `download.rs` (`download_url`) con la misma maquinaria
+  multihilo por rangos y luego verifican el **MD5** de archive.org (crate `md-5`).
+
+La CLI (`main.rs::run_legacy`) gestiona `win7`/`win8`/`win8.1` antes del flujo de
+Microsoft; el servidor (`server.rs`) los expone por los mismos endpoints
+`/api/resolve`, `/api/skus`, `/api/links` y `/api/hashes`.
+
 ### `parse.rs`
 
 Parseo de cadenas puro, sin dependencias de HTML:
@@ -151,6 +177,12 @@ Router `axum` que expone `/api/resolve`, `/api/skus`, `/api/links` y
 `frontend/dist`) con fallback SPA. Las respuestas de `/api/links` se cachean en
 SQLite (`rusqlite`) con clave `(edition_id, language_key)` y un TTL derivado del
 timestamp de expiración de Microsoft (o `--cache-ttl`).
+
+Las ediciones `win7`/`win8`/`win8.1` las gestiona `legacy.rs`: `/api/resolve`
+devuelve un id `legacy:<edición>` y la URL de detalles de archive.org, `/api/skus`
+agrupa las ISOs en SKUs por idioma, `/api/links` devuelve las descargas de
+archive.org (con los MD5 en `hashes`) y `/api/hashes` devuelve nombre → MD5. Estas
+rutas no se cachean.
 
 ---
 

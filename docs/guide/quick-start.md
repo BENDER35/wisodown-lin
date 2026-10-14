@@ -35,11 +35,11 @@ wisodown
 ```
 
 You'll be prompted to pick:
-1. **Windows version** — Windows 11 x64, Windows 11 arm64, Windows 11 Home/Pro (China), or Windows 10
-2. **Language** — any language Microsoft distributes (defaults to English)
-3. **Architecture** (Windows 10 only) — 64-bit or 32-bit
+1. **Windows version** — Windows 11 x64, Windows 11 arm64, Windows 11 Home/Pro (China), Windows 10, or the archive.org editions Windows 7 / 8 / 8.1
+2. **Language** — any language Microsoft distributes (defaults to English); for Windows 8.1 you pick from the archive.org languages
+3. **Architecture** (Windows 10 and the legacy editions) — 64-bit or 32-bit
 
-The ISO downloads to your current directory. SHA-256 is fetched from Microsoft's page automatically and verified against the download.
+The ISO downloads to your current directory. SHA-256 is fetched from Microsoft's page automatically and verified against the download; Windows 7/8/8.1 downloads are verified against archive.org's MD5 instead. Windows 7/8 support English and Spanish.
 
 ## Non-interactive download
 
@@ -51,6 +51,12 @@ wisodown --edition x64 --language English
 
 # Windows 10, French, save to ~/Downloads
 wisodown --edition win10 --language French --output ~/Downloads
+
+# Windows 7 Ultimate SP1 (archive.org), English
+wisodown --edition win7 --language English
+
+# Windows 7 Ultimate SP1 (archive.org), Spanish
+wisodown --edition win7 --language Spanish
 ```
 
 ## What you'll see

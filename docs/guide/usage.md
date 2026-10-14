@@ -12,14 +12,14 @@ Run without options for the interactive wizard.
 
 | Flag | Description |
 | ---- | ----------- |
-| `-e, --edition <ALIAS>` | Named edition: `x64`, `arm64`, `win10`, `win11-cn-home`, `win11-cn-pro` |
+| `-e, --edition <ALIAS>` | Named edition: `x64`, `arm64`, `win10`, `win11-cn-home`, `win11-cn-pro`, plus the archive.org editions `win7`, `win8`, `win8.1` |
 | `--edition-id <N>` | Raw numeric `ProductEditionId` (advanced) |
 | `--page-url <URL>` | Override cookie-acquisition page (requires `--edition-id`) |
-| `-l, --language <LANG>` | Language name, e.g. `English`, `French`, `Japanese`. Case-insensitive. |
+| `-l, --language <LANG>` | Language name, e.g. `English`, `French`, `Japanese`. Case-insensitive. For legacy editions, an exact match wins, else a substring match on the filename. |
 | `-o, --output <DIR>` | Output directory (default: current directory) |
 | `-t, --threads <N>` | Parallel connections for downloading (default: `8`) |
 | `--url-only` | Print the download URL without downloading |
-| `--list-languages` | List available languages for the chosen edition and exit |
+| `--list-languages` | List available languages for the chosen edition and exit (legacy editions list ISO files) |
 | `--cookie <STR>` | Browser cookie string for manual anti-bot bypass |
 | `--verify <SHA256>` | Assert an expected SHA-256 hex digest (overrides page hash). Mutually exclusive with `--no-verify`. |
 | `--no-verify` | Skip SHA-256 fetching, computation, and verification entirely. In multi-threaded mode also skips the re-read hash pass. |
@@ -34,12 +34,21 @@ Run without options for the interactive wizard.
 | `win10` | Windows 10 **22H2** | x86 + x64 (choose at prompt) | `Win10_22H2_<Lang>_x32v1.iso` / `…_x64v1.iso` |
 | `win11-cn-home` | Windows 11 **25H2** Home (China) | x64 | Chinese (Simplified) only |
 | `win11-cn-pro` | Windows 11 **25H2** Pro (China) | x64 | Chinese (Simplified) only |
+| `win7` | Windows 7 **Ultimate SP1** *(archive.org)* | x86 + x64 | `Win7_Ult_SP1_English_x32.iso` / `Win7_Ult_SP1_Spanish_x32.iso` / `…_x64.iso` / `…_x64.es.iso` |
+| `win8` | Windows 8 **RTM** *(archive.org)* | x86 + x64 | `en_windows_8_x86_dvd_915417.iso` / `…_x64_…iso` |
+| `win8.1` | Windows 8.1 **Home/Pro** *(archive.org)* | x86 + x64 | `Win8.1_<Lang>_x32.iso` / `Win8.1_<Lang>_x64.iso` |
 
 Microsoft serves only the latest feature update per product (Windows 11 **25H2**,
 Windows 10 **22H2**). Consumer ISOs are **multi-edition** and 38 languages are
 available for Windows 10 and Windows 11 x64/Arm64.
 
-Aliases `win11`, `win11-x64`, `win11-arm64`, `amd64`, `aarch64`, `cn-home`, `cn-pro` are also accepted.
+The `win7`, `win8` and `win8.1` editions are downloaded from **archive.org**
+(Microsoft retired those consumer ISOs). `win8.1` is multi-language; `win7`/`win8`
+support **English and Spanish** (Spanish ISOs are available via archive.org). Downloads
+are verified against the **MD5** published by archive.org; `--verify` still accepts a
+SHA-256.
+
+Aliases `win11`, `win11-x64`, `win11-arm64`, `amd64`, `aarch64`, `cn-home`, `cn-pro` are also accepted. Legacy editions additionally accept `windows7`, `windows8`, `windows8.1`, `win81`, `windows81` and the bare `7`, `8`, `8.1`.
 
 ## Hash verification
 
@@ -102,6 +111,40 @@ wisodown --edition-id 2618 \
   --page-url https://www.microsoft.com/en-us/software-download/windows10ISO \
   --language English
 ```
+
+## Legacy editions (Windows 7 / 8 / 8.1)
+
+These are served from **archive.org**, not Microsoft:
+
+```sh
+# Windows 7 Ultimate SP1, 64-bit (Spanish)
+wisodown --edition win7 --language Spanish
+
+# Windows 7 Ultimate SP1, 64-bit (English)
+wisodown --edition win7 --language English
+
+# Windows 8 RTM, 32-bit (English)
+wisodown --edition win8 --language English
+
+# Windows 8 RTM, 64-bit (English)
+wisodown --edition win8 --language English
+
+# Windows 8.1 (multi-language; 32- and 64-bit available)
+wisodown --edition win8.1 --language Spanish
+
+# List every ISO available for an edition
+wisodown --edition win8.1 --list-languages
+
+# Print the archive.org URL only
+wisodown --edition win7 --language English --url-only
+```
+
+The ISO list (names, sizes, MD5) is read from the archive.org metadata API at
+runtime, so it stays current. Because several languages ship both a 32-bit and a
+64-bit file, a language query may match more than one ISO — you'll get a picker
+unless the match is unique. `win7` and `win8` support English and Spanish;
+`win8.1` uses substring matching on the filename. Downloads are verified against
+archive.org's MD5.
 
 ## List available languages
 
