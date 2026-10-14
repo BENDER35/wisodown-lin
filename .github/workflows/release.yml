@@ -5,6 +5,11 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to attach assets to (manual runs)'
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -13,9 +18,13 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  linux:
-    name: Linux x86_64 release
-    runs-on: ubuntu-latest
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
 
@@ -28,18 +37,57 @@ jobs:
       - name: Build
         run: cargo build --release --features server
 
-      - name: Package
+      - name: Package (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        env:
+          RUNNER_OS: ${{ runner.os }}
+          RUNNER_ARCH: ${{ runner.arch }}
         run: |
-          mkdir -p dist/scripts dist/docs/guide
+          set -euo pipefail
+          case "${RUNNER_OS}" in
+            Linux) os=linux ;;
+            macOS) os=macos ;;
+            *) os="${RUNNER_OS,,}" ;;
+          esac
+          case "${RUNNER_ARCH}" in
+            X64) arch=x86_64 ;;
+            ARM64) arch=arm64 ;;
+            *) arch="${RUNNER_ARCH}" ;;
+          esac
+          asset="wisodown-${os}-${arch}.zip"
+          rm -rf dist && mkdir -p dist/scripts dist/docs/guide
           cp target/release/wisodown dist/
           cp target/release/wisodown-server dist/
           cp README.md README.es.md LICENSE THIRD_PARTY_LICENSES dist/
           cp scripts/get-iso.sh scripts/get-iso.ps1 dist/scripts/
           cp docs/guide/technical.md docs/guide/technical.es.md dist/docs/guide/
-          (cd dist && zip -r ../wisodown-linux-x86_64.zip .)
+          (cd dist && zip -r "../${asset}" .)
+          echo "ASSET=${asset}" >> "$GITHUB_ENV"
+          echo "Packaged ${asset}"
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          RUNNER_ARCH: ${{ runner.arch }}
+        run: |
+          $arch = switch ($env:RUNNER_ARCH) { 'X64' { 'x86_64' } 'ARM64' { 'arm64' } default { $env:RUNNER_ARCH } }
+          $asset = "wisodown-windows-$arch.zip"
+          Remove-Item -Recurse -Force dist -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force -Path dist/scripts, dist/docs/guide | Out-Null
+          Copy-Item target/release/wisodown.exe dist/
+          Copy-Item target/release/wisodown-server.exe dist/
+          Copy-Item README.md, README.es.md, LICENSE, THIRD_PARTY_LICENSES dist/
+          Copy-Item scripts/get-iso.sh, scripts/get-iso.ps1 dist/scripts/
+          Copy-Item docs/guide/technical.md, docs/guide/technical.es.md dist/docs/guide/
+          Compress-Archive -Path dist/* -DestinationPath $asset -Force
+          "ASSET=$asset" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          Write-Host "Packaged $asset"
 
       - name: Publish release asset
         uses: softprops/action-gh-release@v2
         with:
-          files: wisodown-linux-x86_64.zip
-          generate_release_notes: true
+          files: ${{ env.ASSET }}
+          tag_name: ${{ inputs.tag || github.ref_name }}
+          generate_release_notes: ${{ !inputs.tag }}

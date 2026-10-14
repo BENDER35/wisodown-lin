@@ -86,10 +86,11 @@ cargo build --release --features server
 Windows soportados: **Windows 10 y Windows 11** (x64 y ARM64). Windows 7/8.1 ya
 no están soportados por los toolchains actuales de Rust.
 
-> **Releases precompiladas:** la release `v0.1.3` publica por ahora solo binarios
-> de Linux. En Windows puedes compilar desde el código fuente, o usar el script
-> auxiliar `scripts/get-iso.ps1` (no requiere compilar nada), o ejecutar el
-> servidor/programa donde prefieras.
+> **Releases precompiladas:** cada release incluye archivos listos para ejecutar
+> para Linux (`wisodown-linux-x86_64.zip`), macOS (`wisodown-macos-*.zip`) y
+> Windows (`wisodown-windows-x86_64.zip`). También puedes compilar desde el
+> código fuente, o usar el script auxiliar `scripts/get-iso.ps1` (no requiere
+> compilar nada).
 
 ### Scripts auxiliares
 
