@@ -81,16 +81,22 @@ cargo build --release
 # con el servidor opcional (necesita el compilador de C para el SQLite embebido):
 cargo build --release --features server
 # binario: target\release\wisodown-server.exe
+
+# compilación de 32 bits (x86) — requiere el toolset C++ x86 de Visual Studio:
+rustup target add i686-pc-windows-msvc
+cargo build --release --target i686-pc-windows-msvc
+# binario: target\i686-pc-windows-msvc\release\wisodown.exe
 ```
 
-Windows soportados: **Windows 10 y Windows 11** (x64 y ARM64). Windows 7/8.1 ya
-no están soportados por los toolchains actuales de Rust.
+Windows soportados: **Windows 10 y Windows 11** — x64, ARM64 y x86 de 32 bits
+(`i686`). Windows 7/8.1 ya no están soportados por los toolchains actuales de
+Rust.
 
-> **Releases precompiladas:** cada release incluye archivos listos para ejecutar
-> para Linux (`wisodown-linux-x86_64.zip`), macOS (`wisodown-macos-*.zip`) y
-> Windows (`wisodown-windows-x86_64.zip`). También puedes compilar desde el
-> código fuente, o usar el script auxiliar `scripts/get-iso.ps1` (no requiere
-> compilar nada).
+> **Releases precompiladas:** cada release incluye archivos listos para ejecutar:
+> `wisodown-linux-x86_64.zip`, `wisodown-macos-*.zip`,
+> `wisodown-windows-x86_64.zip` (64 bits) y `wisodown-windows-i686.zip`
+> (32 bits). También puedes compilar desde el código fuente, o usar el script
+> auxiliar `scripts/get-iso.ps1` (no requiere compilar nada).
 
 ### Scripts auxiliares
 
