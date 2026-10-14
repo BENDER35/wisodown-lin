@@ -48,6 +48,19 @@ Download Windows 10 and Windows 11 ISOs directly from Microsoft's servers — pl
 - A C compiler (`cc`/`gcc`/`clang`) — required by the bundled SQLite used by the optional server
 - **No system OpenSSL needed**: TLS is provided by `rustls` with bundled roots, so the build is self-contained on any OS
 
+## Windows support lifecycle
+
+Microsoft's Windows support policy affects which ISO versions you can safely use with this tool:
+
+- **Windows 7** mainstream support ended **January 13, 2015**, extended support ended **January 14, 2020**. No longer receives security updates.
+- **Windows 8** support ended **January 12, 2016**. No longer receives security updates.
+- **Windows 8.1** support ended **January 10, 2018**. No longer receives security updates.
+- **Windows 10** mainstream support ended **October 13, 2020**. Extended support ends **October 14, 2025**.
+- **Windows 10 ESU** (Extended Security Updates) is available for Windows 10 Enterprise through **January 2028** (via Volume Licensing). ESU receives critical security updates even after extended support ends.
+- **Root certificate rotation**: Starting in 2023, Microsoft began rotating trusted root certificates. Systems running Windows 7/8/8.1 **without ESU** may lose the ability to connect to Windows Update and some Microsoft services as old roots expire and new ones are not installed. Windows 10 with ESU receives the certificate updates. This may affect the tool's ability to acquire Microsoft API cookies on unpatched systems.
+
+> **Recommendation**: Use Windows 10 with ESU if still required for legacy workflows, or migrate to a currently supported OS. The tool itself runs on any OS with Rust, but the Windows ISOs it downloads have the above lifecycle.
+
 ## Install
 
 ```sh

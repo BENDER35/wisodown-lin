@@ -77,6 +77,33 @@ To skip verification entirely (also skips the re-read pass in multi-threaded mod
 wisodown --edition x64 --language English --no-verify
 ```
 
+## Requirements
+
+SHA-256 hashes are **fetched automatically** from the Microsoft download page before each download and verified against the file as it streams. You don't need to do anything — the output will show:
+
+```
+➜ Fetching integrity hashes from Microsoft…
+  ℹ Expected SHA-256: 768984706b909479…
+...
+  SHA-256: 768984706b909479…
+✔ Hash verified
+```
+
+On a hash mismatch, `wisodown` prints an error and exits with a non-zero code — **the file is kept** at the destination so you can inspect or retry it manually.
+
+To use your own expected hash instead of the page hash, pass `--verify`:
+
+```sh
+wisodown --edition x64 --language English \
+  --verify 768984706b909479417b2368438909440f2967ff05c6a9195ed2667254e465e3
+```
+
+To skip verification entirely (also skips the re-read pass in multi-threaded mode):
+
+```sh
+wisodown --edition x64 --language English --no-verify
+```
+
 ## Parallel downloading
 
 By default `wisodown` uses **8 parallel connections** via HTTP Range requests, which typically 2–4× faster than a single connection on high-bandwidth links.
@@ -95,6 +122,21 @@ The download is written to a `.part` file in the same directory and renamed to t
 
 - Interrupted downloads never leave a partial file at the destination path.
 - Ctrl+C removes the `.part` file immediately.
+
+---
+
+## Windows support lifecycle
+
+Microsoft's Windows support policy affects which ISO versions you can safely use with this tool:
+
+- **Windows 7** mainstream support ended **January 13, 2015**, extended support ended **January 14, 2020**. No longer receives security updates.
+- **Windows 8** support ended **January 12, 2016**. No longer receives security updates.
+- **Windows 8.1** support ended **January 10, 2018**. No longer receives security updates.
+- **Windows 10** mainstream support ended **October 13, 2020**. Extended support ends **October 14, 2025**.
+- **Windows 10 ESU** (Extended Security Updates) is available for Windows 10 Enterprise through **January 2028** (via Volume Licensing). ESU receives critical security updates even after extended support ends.
+- **Root certificate rotation**: Starting in 2023, Microsoft began rotating trusted root certificates. Systems running Windows 7/8/8.1 **without ESU** may lose the ability to connect to Windows Update and some Microsoft services as old roots expire and new ones are not installed. Windows 10 with ESU receives the certificate updates. This may affect the tool's ability to acquire Microsoft API cookies on unpatched systems.
+
+> **Recommendation**: Use Windows 10 with ESU if still required for legacy workflows, or migrate to a currently supported OS. The tool itself runs on any OS with Rust, but the Windows ISOs it downloads have the above lifecycle.
 
 ## Using raw edition IDs
 

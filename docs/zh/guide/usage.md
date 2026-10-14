@@ -93,6 +93,19 @@ wisodown --edition x64 --language English --threads 1
 - 中断的下载不会在目标路径留下不完整的文件。
 - Ctrl+C 会立即删除 `.part` 文件。
 
+## Ciclo de vida del soporte de Windows
+
+La política de soporte de Microsoft afecta a qué versiones de ISO puedes usar con seguridad con esta herramienta:
+
+- **Windows 7** el soporte principal terminó el **13 de enero de 2015**, el soporte extendido terminó el **14 de enero de 2020**. Ya no recibe actualizaciones de seguridad.
+- **Windows 8** el soporte terminó el **12 de enero de 2016**. Ya no recibe actualizaciones de seguridad.
+- **Windows 8.1** el soporte terminó el **10 de enero de 2018**. Ya no recibe actualizaciones de seguridad.
+- **Windows 10** el soporte principal terminó el **13 de octubre de 2020**. El soporte extendido termina el **14 de octubre de 2025**.
+- **Windows 10 ESU** (Actualizaciones de seguridad extendidas) está disponible para Windows 10 Enterprise hasta **enero de 2028** (a través de Licencias por Volumen). ESU recibe actualizaciones de seguridad críticas incluso después de que termina el soporte extendido.
+- **Rotación de certificados raíz**: A partir de 2023, Microsoft comenzó a rotar los certificados raíz de confianza. Los sistemas que ejecutan Windows 7/8/8.1 **sin ESU** pueden perder la capacidad de conectarse a Windows Update y algunos servicios de Microsoft a medida que expiran las raíces antiguas y no se instalan las nuevas. Windows 10 con ESU recibe las actualizaciones de certificados. Esto puede afectar la capacidad de la herramienta para adquirir cookies de la API de Microsoft en sistemas sin actualizar.
+
+> **Recomendación**: Si aún se requiere para flujos de trabajo heredados, use Windows 10 con ESU, o migre a un SO actualmente compatible. La herramienta misma se ejecuta en cualquier SO con Rust, pero los ISOs de Windows que descarga tienen el ciclo de vida anterior.
+
 ## 使用原始版本 ID
 
 微软网站上的每个 ISO 产品都有一个数字 `ProductEditionId`。你可以直接传入该 ID 来下载没有命名别名的版本：

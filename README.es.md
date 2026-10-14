@@ -56,6 +56,19 @@ Tool y sin navegador.
 - **No hace falta OpenSSL del sistema**: el TLS lo aporta `rustls` con raíces
   incluidas, así que la compilación es autocontenida en cualquier SO
 
+## Ciclo de vida del soporte de Windows
+
+La política de soporte de Microsoft afecta a qué versiones de ISO puedes usar con seguridad con esta herramienta:
+
+- **Windows 7** el soporte principal terminó el **13 de enero de 2015**, el soporte extendido terminó el **14 de enero de 2020**. Ya no recibe actualizaciones de seguridad.
+- **Windows 8** el soporte terminó el **12 de enero de 2016**. Ya no recibe actualizaciones de seguridad.
+- **Windows 8.1** el soporte terminó el **10 de enero de 2018**. Ya no recibe actualizaciones de seguridad.
+- **Windows 10** el soporte principal terminó el **13 de octubre de 2020**. El soporte extendido termina el **14 de octubre de 2025**.
+- **Windows 10 ESU** (Actualizaciones de seguridad extendidas) está disponible para Windows 10 Enterprise hasta **enero de 2028** (a través de Volumen Licencias). ESU recibe actualizaciones de seguridad críticas incluso después de que termina el soporte extendido.
+- **Rotación de certificados raíz**: A partir de 2023, Microsoft comenzó a rotar los certificados raíz de confianza. Los sistemas que ejecutan Windows 7/8/8.1 **sin ESU** pueden perder la capacidad de conectarse a Windows Update y algunos servicios de Microsoft a medida que expiran las raíces antiguas y no se instalan las nuevas. Windows 10 con ESU recibe las actualizaciones de certificados. Esto puede afectar la capacidad de la herramienta para adquirir cookies de la API de Microsoft en sistemas sin actualizar.
+
+> **Recomendación**: Si aún se requiere para flujos de trabajo heredados, use Windows 10 con ESU, o migre a un SO actualmente compatible. La herramienta misma se ejecuta en cualquier SO con Rust, pero los ISOs de Windows que descarga tienen el ciclo de vida anterior.
+
 ## Instalación
 
 ```sh
