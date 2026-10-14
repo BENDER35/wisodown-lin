@@ -30,11 +30,12 @@ jobs:
 
       - name: Package
         run: |
-          mkdir -p dist/scripts
+          mkdir -p dist/scripts dist/docs/guide
           cp target/release/wisodown dist/
           cp target/release/wisodown-server dist/
           cp README.md LICENSE THIRD_PARTY_LICENSES dist/
           cp scripts/get-iso.sh scripts/get-iso.ps1 dist/scripts/
+          cp docs/guide/technical.md docs/guide/technical.es.md dist/docs/guide/
           (cd dist && zip -r ../wisodown-linux-x86_64.zip .)
 
       - name: Publish release asset
