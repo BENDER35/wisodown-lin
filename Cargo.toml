@@ -1,6 +1,6 @@
 [package]
 name = "windows-iso-downloader"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 description = "Download Windows 10 and Windows 11 ISOs directly from Microsoft"
 license = "GPL-3.0-only"
@@ -39,7 +39,7 @@ hex = "0.4"
 
 # ── Native-only dependencies ────────────────────────────────────────────────
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-reqwest = { version = "0.12", features = ["json", "stream", "cookies"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "cookies", "rustls-tls"] }
 tokio = { version = "1", features = ["full"] }
 clap = { version = "4", features = ["derive"] }
 dialoguer = "0.11"
@@ -56,7 +56,7 @@ time = { version = "0.3", features = ["parsing", "formatting"] }
 
 # ── Wasm-only dependencies ──────────────────────────────────────────────────
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-reqwest = { version = "0.12", features = ["json"] }
+reqwest = { version = "0.12", default-features = false, features = ["json"] }
 uuid = { version = "1", features = ["v4", "js"] }
 js-sys = "0.3"
 wasm-bindgen = "0.2"

@@ -1,0 +1,44 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  linux:
+    name: Linux x86_64 release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        run: cargo build --release --features server
+
+      - name: Package
+        run: |
+          mkdir -p dist/scripts
+          cp target/release/wisodown dist/
+          cp target/release/wisodown-server dist/
+          cp README.md LICENSE THIRD_PARTY_LICENSES dist/
+          cp scripts/get-iso.sh scripts/get-iso.ps1 dist/scripts/
+          (cd dist && zip -r ../wisodown-linux-x86_64.zip .)
+
+      - name: Publish release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: wisodown-linux-x86_64.zip
+          generate_release_notes: true

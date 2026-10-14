@@ -29,6 +29,8 @@ export default defineConfig({
               { text: 'Quick Start', link: '/guide/quick-start' },
               { text: 'Usage', link: '/guide/usage' },
               { text: 'How It Works', link: '/guide/how-it-works' },
+              { text: 'Technical Reference', link: '/guide/technical' },
+              { text: 'Referencia técnica (ES)', link: '/guide/technical.es' },
             ],
           },
         ],

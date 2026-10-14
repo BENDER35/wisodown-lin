@@ -14,6 +14,12 @@ Download Windows 10 and Windows 11 ISOs directly from Microsoft's servers — no
 - Progress bar with speed and ETA
 - `--url-only` mode to just print the download link
 
+## Requirements
+
+- A Rust toolchain (`cargo`, stable 1.75+)
+- A C compiler (`cc`/`gcc`/`clang`) — required by the bundled SQLite used by the optional server
+- **No system OpenSSL needed**: TLS is provided by `rustls` with bundled roots, so the build is self-contained on any OS
+
 ## Install
 
 ```sh
@@ -26,6 +32,44 @@ Or build manually:
 ```sh
 cargo build --release
 # binary at target/release/wisodown
+```
+
+### Building on Linux
+
+The project is fully cross-platform and builds natively on Linux — there is no
+Windows-specific code (`winapi`, `#[cfg(windows)]`, backslash paths, …). Only
+the ISO *products* are Windows; the tool itself runs anywhere Rust runs.
+
+```sh
+git clone https://github.com/BENDER35/wisodown-lin
+cd wisodown-lin
+cargo build --release
+# binary: target/release/wisodown
+```
+
+To also build the optional self-hosted server (needs a C compiler for bundled
+SQLite):
+
+```sh
+cargo build --release --features server
+# binary: target/release/wisodown-server
+```
+
+### Helper scripts
+
+| Script | Platform | Requirements |
+| ------ | -------- | ------------ |
+| `scripts/get-iso.sh` | Linux / macOS | `bash`, `curl`, `jq` |
+| `scripts/get-iso.ps1` | Windows / Linux / macOS (PowerShell 7+) | `pwsh` |
+
+Both talk to the hosted API (`https://wiso.krnl64.win`) and can print a download
+link or download the ISO directly. On Linux the PowerShell script runs with
+[`pwsh`](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-linux):
+
+```sh
+pwsh ./scripts/get-iso.ps1 -Edition x64 -Language English
+# or, after chmod +x:
+./scripts/get-iso.ps1 -Edition x64 -Language English
 ```
 
 ## Usage
