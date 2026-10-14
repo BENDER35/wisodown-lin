@@ -19,36 +19,54 @@ env:
 
 jobs:
   build:
-    name: Build (${{ matrix.os }})
+    name: Build (${{ matrix.os }} / ${{ matrix.target || 'host' }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+          - os: macos-latest
+          - os: windows-latest
+          - os: windows-latest
+            target: i686-pc-windows-msvc
     steps:
       - uses: actions/checkout@v4
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target || 'host' }}
 
       - name: Build
-        run: cargo build --release --features server
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -euo pipefail
+          if [ -n "${TARGET:-}" ]; then
+            cargo build --release --features server --target "$TARGET"
+          else
+            cargo build --release --features server
+          fi
 
       - name: Package (Unix)
         if: runner.os != 'Windows'
         shell: bash
         env:
-          RUNNER_OS: ${{ runner.os }}
+          RUNNER_OS_NAME: ${{ runner.os }}
           RUNNER_ARCH: ${{ runner.arch }}
         run: |
           set -euo pipefail
-          case "${RUNNER_OS}" in
+          case "${RUNNER_OS_NAME}" in
             Linux) os=linux ;;
             macOS) os=macos ;;
-            *) os="${RUNNER_OS,,}" ;;
+            *) os="${RUNNER_OS_NAME,,}" ;;
           esac
           case "${RUNNER_ARCH}" in
             X64) arch=x86_64 ;;
@@ -71,13 +89,15 @@ jobs:
         shell: pwsh
         env:
           RUNNER_ARCH: ${{ runner.arch }}
+          TARGET: ${{ matrix.target }}
         run: |
-          $arch = switch ($env:RUNNER_ARCH) { 'X64' { 'x86_64' } 'ARM64' { 'arm64' } default { $env:RUNNER_ARCH } }
+          $binDir = if ($env:TARGET) { "target/$($env:TARGET)/release" } else { "target/release" }
+          $arch = if ($env:TARGET -match 'i686') { 'i686' } elseif ($env:RUNNER_ARCH -eq 'ARM64') { 'arm64' } else { 'x86_64' }
           $asset = "wisodown-windows-$arch.zip"
           Remove-Item -Recurse -Force dist -ErrorAction SilentlyContinue
           New-Item -ItemType Directory -Force -Path dist/scripts, dist/docs/guide | Out-Null
-          Copy-Item target/release/wisodown.exe dist/
-          Copy-Item target/release/wisodown-server.exe dist/
+          Copy-Item "$binDir/wisodown.exe" dist/
+          Copy-Item "$binDir/wisodown-server.exe" dist/
           Copy-Item README.md, README.es.md, LICENSE, THIRD_PARTY_LICENSES dist/
           Copy-Item scripts/get-iso.sh, scripts/get-iso.ps1 dist/scripts/
           Copy-Item docs/guide/technical.md, docs/guide/technical.es.md dist/docs/guide/
