@@ -1,16 +1,26 @@
 # Quick Start
 
-## Use online
+## Download prebuilt binaries
 
-No installation needed — visit **[wiso.krnl64.win](https://wiso.krnl64.win)** to download ISOs directly from your browser. Select an edition, pick a language, and get a direct download link from Microsoft.
+Grab an archive for **Linux, macOS or Windows (64-bit / 32-bit)** from
+**[GitHub Releases](https://github.com/BENDER35/wisodown-lin/releases/latest)**.
+
+## Run the web UI locally
+
+The binary ships an optional server with an embedded web UI. Start it and open
+<http://localhost:3000>:
+
+```sh
+cargo run --release --features server -- --port 3000
+```
 
 ## Install locally
 
 You need [Rust](https://rustup.rs) installed.
 
 ```sh
-git clone https://github.com/ntkrnl64/win11_iso
-cd win11_iso
+git clone https://github.com/BENDER35/wisodown-lin
+cd wisodown-lin
 cargo install --path .
 ```
 
@@ -48,15 +58,15 @@ wisodown --edition win10 --language French --output ~/Downloads
 ```
 ➜ Initializing session for Windows 11 (x64)…
 ➜ Fetching available languages…
-➜ Selected: English (SKU 5585)
+➜ Selected: English (SKU 20046)
 ➜ Requesting download link…
-  ℹ Link expires: 2026-03-22T18:00:00Z
+  ℹ Link expires: 2026-10-15T18:00:00Z
 ➜ Fetching integrity hashes from Microsoft…
   ℹ Expected SHA-256: 768984706b909479...
-⬇ Downloading Windows 11 English 64-bit → Win11_24H2_English_x64.iso
-  ⣾ [████████████████░░░░░░░░] 2.4 GB/6.0 GB (4m32s) 22 MB/s
+⬇ Downloading Windows 11 English 64-bit → Win11_25H2_English_x64_v2.iso
+  ⣾ [████████████████░░░░░░░░] 2.4 GB/7.2 GB (4m32s) 22 MB/s
 
-✔ Saved to Win11_24H2_English_x64.iso
+✔ Saved to Win11_25H2_English_x64_v2.iso
   SHA-256: 768984706b909479...
 ✔ Hash verified
 ```

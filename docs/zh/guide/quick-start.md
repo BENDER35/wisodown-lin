@@ -1,16 +1,24 @@
 # 快速开始
 
-## 在线使用
+## 下载预编译版本
 
-无需安装 — 访问 **[wiso.krnl64.win](https://wiso.krnl64.win)** 即可直接在浏览器中下载 ISO 镜像。选择版本、选择语言，即可获取来自微软的直接下载链接。
+无需安装 — 从 [GitHub Releases](https://github.com/BENDER35/wisodown-lin/releases/latest) 下载适用于 Linux、macOS 或 Windows（64 位 / 32 位）的压缩包。
+
+## 自建网页版
+
+运行自带的服务器后，在浏览器中打开 <http://localhost:3000>：
+
+```sh
+cargo run --release --features server -- --port 3000
+```
 
 ## 本地安装
 
 需要先安装 [Rust](https://rustup.rs)。
 
 ```sh
-git clone https://github.com/ntkrnl64/win11_iso
-cd win11_iso
+git clone https://github.com/BENDER35/wisodown-lin
+cd wisodown-lin
 cargo install --path .
 ```
 
@@ -48,15 +56,15 @@ wisodown --edition win10 --language French --output ~/Downloads
 ```
 ➜ Initializing session for Windows 11 (x64)…
 ➜ Fetching available languages…
-➜ Selected: English (SKU 5585)
+➜ Selected: English (SKU 20046)
 ➜ Requesting download link…
-  ℹ Link expires: 2026-03-22T18:00:00Z
+  ℹ Link expires: 2026-10-15T18:00:00Z
 ➜ Fetching integrity hashes from Microsoft…
   ℹ Expected SHA-256: 768984706b909479...
-⬇ Downloading Windows 11 English 64-bit → Win11_24H2_English_x64.iso
-  ⣾ [████████████████░░░░░░░░] 2.4 GB/6.0 GB (4m32s) 22 MB/s
+⬇ Downloading Windows 11 English 64-bit → Win11_25H2_English_x64_v2.iso
+  ⣾ [████████████████░░░░░░░░] 2.4 GB/7.2 GB (4m32s) 22 MB/s
 
-✔ Saved to Win11_24H2_English_x64.iso
+✔ Saved to Win11_25H2_English_x64_v2.iso
   SHA-256: 768984706b909479...
 ✔ Hash verified
 ```

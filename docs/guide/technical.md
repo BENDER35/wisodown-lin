@@ -105,6 +105,27 @@ Maps user aliases (`x64`, `arm64`, `win10`, `win11-cn-home`, `win11-cn-pro`, …
 to a `(ProductEditionId, page_url)` pair. Also hosts `find_sku_by_language` and
 `filename_from_url`.
 
+The aliases resolve to the current Microsoft products (verified live against the
+Microsoft API):
+
+| Alias | `ProductEditionId` | Page | Version | Architecture | ISO filename |
+| ----- | ------------------ | ---- | ------- | ------------ | ------------ |
+| `x64` | `3321` | `software-download/windows11` | Windows 11 **25H2** | x64 | `Win11_25H2_<Lang>_x64_v2.iso` |
+| `arm64` | `3324` | `software-download/windows11arm64` | Windows 11 **25H2** | Arm64 | `Win11_25H2_<Lang>_Arm64_v2.iso` |
+| `win10` | `2618` | `software-download/windows10ISO` | Windows 10 **22H2** | x86 + x64 | `Win10_22H2_<Lang>_x32v1.iso` / `…_x64v1.iso` |
+| `win11-cn-home` | `3322` | `software-download/windows11` | Windows 11 **25H2** Home China | x64 | Chinese (Simplified) only |
+| `win11-cn-pro` | `3323` | `software-download/windows11` | Windows 11 **25H2** Pro China | x64 | Chinese (Simplified) only |
+
+Microsoft only serves the **latest** feature update per product: Windows 11
+**25H2** and Windows 10 **22H2**. Consumer ISOs are **multi-edition** (Home, Pro,
+Education, …) — the product key selects the edition at install time. There is no
+32-bit Windows 11 media, and no LTSC/IoT media on the public pages.
+
+`win10` is the only alias that returns **two** download options (32-bit `x32` and
+64-bit `x64`); the CLI shows a `Select download` prompt whenever more than one
+option comes back (`x64`/`arm64` return a single option). 38 languages are
+available for Windows 10 and for Windows 11 x64/Arm64.
+
 ### `parse.rs`
 
 Pure string parsing — no HTML dependency:
@@ -259,9 +280,13 @@ Graceful shutdown is triggered on Ctrl+C.
 - **CI** (`ci.yml`): on every push to `main` and on pull requests, runs
   `cargo check`/`build` on Ubuntu, macOS, and Windows, with and without the
   `server` feature.
-- **Release** (`release.yml`): pushing a `v*` tag builds the Linux artifacts and
-  publishes `wisodown-linux-x86_64.zip` (both binaries, README, licenses, and
-  helper scripts) to the GitHub release.
+- **Release** (`release.yml`): a matrix on Ubuntu / macOS / Windows (x86_64 and
+  i686) builds and publishes per-platform archives —
+  `wisodown-linux-x86_64.zip`, `wisodown-macos-arm64.zip`,
+  `wisodown-windows-x86_64.zip` and `wisodown-windows-i686.zip`. Each archive
+  contains both binaries, the EN/ES READMEs, the licenses, the helper scripts and
+  the technical guides. `workflow_dispatch` accepts an optional `tag` input to
+  (re)attach assets to an existing release.
 
 ---
 

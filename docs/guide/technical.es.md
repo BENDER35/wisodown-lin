@@ -106,6 +106,28 @@ Convierte los alias de usuario (`x64`, `arm64`, `win10`, `win11-cn-home`,
 `win11-cn-pro`, …) en un par `(ProductEditionId, page_url)`. También aloja
 `find_sku_by_language` y `filename_from_url`.
 
+Los alias se resuelven a los productos actuales de Microsoft (verificado en vivo
+contra la API de Microsoft):
+
+| Alias | `ProductEditionId` | Página | Versión | Arquitectura | Nombre del ISO |
+| ----- | ------------------ | ------ | ------- | ------------ | -------------- |
+| `x64` | `3321` | `software-download/windows11` | Windows 11 **25H2** | x64 | `Win11_25H2_<Idioma>_x64_v2.iso` |
+| `arm64` | `3324` | `software-download/windows11arm64` | Windows 11 **25H2** | Arm64 | `Win11_25H2_<Idioma>_Arm64_v2.iso` |
+| `win10` | `2618` | `software-download/windows10ISO` | Windows 10 **22H2** | x86 + x64 | `Win10_22H2_<Idioma>_x32v1.iso` / `…_x64v1.iso` |
+| `win11-cn-home` | `3322` | `software-download/windows11` | Windows 11 **25H2** Home China | x64 | solo chino simplificado |
+| `win11-cn-pro` | `3323` | `software-download/windows11` | Windows 11 **25H2** Pro China | x64 | solo chino simplificado |
+
+Microsoft solo sirve la **última** actualización de características de cada
+producto: Windows 11 **25H2** y Windows 10 **22H2**. Las ISOs de consumidor son
+**multiedición** (Home, Pro, Education, …) — la clave de producto elige la
+edición al instalar. No hay medios de Windows 11 de 32 bits ni medios LTSC/IoT en
+las páginas públicas.
+
+`win10` es el único alias que devuelve **dos** opciones de descarga (32 bits `x32`
+y 64 bits `x64`); la CLI muestra un prompt `Select download` cuando hay más de
+una opción (`x64`/`arm64` devuelven una sola). Hay 38 idiomas disponibles para
+Windows 10 y para Windows 11 x64/Arm64.
+
 ### `parse.rs`
 
 Parseo de cadenas puro, sin dependencias de HTML:
@@ -262,9 +284,13 @@ apagado ordenado se dispara con Ctrl+C.
 - **CI** (`ci.yml`): en cada push a `main` y en pull requests ejecuta
   `cargo check`/`build` en Ubuntu, macOS y Windows, con y sin la feature
   `server`.
-- **Release** (`release.yml`): al empujar un tag `v*` compila los artefactos de
-  Linux y publica `wisodown-linux-x86_64.zip` (ambos binarios, README, licencias
-  y scripts auxiliares) en la release de GitHub.
+- **Release** (`release.yml`): una matriz en Ubuntu / macOS / Windows (x86_64 e
+  i686) compila y publica archivos por plataforma —
+  `wisodown-linux-x86_64.zip`, `wisodown-macos-arm64.zip`,
+  `wisodown-windows-x86_64.zip` y `wisodown-windows-i686.zip`. Cada archivo
+  incluye ambos binarios, los READMEs EN/ES, las licencias, los scripts
+  auxiliares y las guías técnicas. `workflow_dispatch` acepta un input opcional
+  `tag` para (re)adjuntar los assets a una release existente.
 
 ---
 

@@ -408,7 +408,7 @@ async fn api_hashes(Query(params): Query<EditionParams>) -> Response {
 async fn docs_redirect() -> Response {
     (
         StatusCode::FOUND,
-        [(header::LOCATION, "https://wisodocs.krnl64.win")],
+        [(header::LOCATION, "https://github.com/BENDER35/wisodown-lin/tree/main/docs")],
     )
         .into_response()
 }

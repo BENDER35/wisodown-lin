@@ -27,13 +27,17 @@ Run without options for the interactive wizard.
 
 ## Edition aliases
 
-| `--edition` | Windows version |
-| ----------- | --------------- |
-| `x64` | Windows 11, 64-bit (x86-64) |
-| `arm64` | Windows 11, ARM 64-bit |
-| `win10` | Windows 10, multi-edition (Home/Pro, 32-bit + 64-bit) |
-| `win11-cn-home` | Windows 11 Home (China only) |
-| `win11-cn-pro` | Windows 11 Pro Chinese version |
+| `--edition` | Windows version | Architecture | ISO filename |
+| ----------- | --------------- | ------------ | ------------ |
+| `x64` | Windows 11 **25H2** | x64 (64-bit) | `Win11_25H2_<Lang>_x64_v2.iso` |
+| `arm64` | Windows 11 **25H2** | Arm64 | `Win11_25H2_<Lang>_Arm64_v2.iso` |
+| `win10` | Windows 10 **22H2** | x86 + x64 (choose at prompt) | `Win10_22H2_<Lang>_x32v1.iso` / `…_x64v1.iso` |
+| `win11-cn-home` | Windows 11 **25H2** Home (China) | x64 | Chinese (Simplified) only |
+| `win11-cn-pro` | Windows 11 **25H2** Pro (China) | x64 | Chinese (Simplified) only |
+
+Microsoft serves only the latest feature update per product (Windows 11 **25H2**,
+Windows 10 **22H2**). Consumer ISOs are **multi-edition** and 38 languages are
+available for Windows 10 and Windows 11 x64/Arm64.
 
 Aliases `win11`, `win11-x64`, `win11-arm64`, `amd64`, `aarch64`, `cn-home`, `cn-pro` are also accepted.
 
@@ -110,9 +114,9 @@ Output:
 
 ```
 Available languages:
-  Arabic                         (id: 1234, file: Win11_24H2_Arabic_x64.iso)
-  English                        (id: 5585, file: Win11_24H2_English_x64.iso)
-  French                         (id: 5586, file: Win11_24H2_French_x64.iso)
+  Arabic                         (id: 20035, file: Win11_25H2_Arabic_x64_v2.iso)
+  English                        (id: 20046, file: Win11_25H2_English_x64_v2.iso)
+  French                         (id: 20047, file: Win11_25H2_French_x64_v2.iso)
   ...
 ```
 

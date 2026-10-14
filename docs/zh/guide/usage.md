@@ -27,13 +27,16 @@ wisodown [OPTIONS]
 
 ## 版本别名
 
-| `--edition` | Windows 版本 |
-| ----------- | ------------ |
-| `x64` | Windows 11，64 位 (x86-64) |
-| `arm64` | Windows 11，ARM 64 位 |
-| `win10` | Windows 10，多版本（家庭版/专业版，32 位 + 64 位） |
-| `win11-cn-home` | Windows 11 家庭中文版（仅限中国） |
-| `win11-cn-pro` | Windows 11 专业中文版 |
+| `--edition` | Windows 版本 | 架构 | ISO 文件名 |
+| ----------- | ------------ | ---- | ---------- |
+| `x64` | Windows 11 **25H2** | x64 (64 位) | `Win11_25H2_<Lang>_x64_v2.iso` |
+| `arm64` | Windows 11 **25H2** | Arm64 | `Win11_25H2_<Lang>_Arm64_v2.iso` |
+| `win10` | Windows 10 **22H2** | x86 + x64（提示时选择） | `Win10_22H2_<Lang>_x32v1.iso` / `…_x64v1.iso` |
+| `win11-cn-home` | Windows 11 **25H2** 家庭中文版 | x64 | 仅简体中文 |
+| `win11-cn-pro` | Windows 11 **25H2** 专业中文版 | x64 | 仅简体中文 |
+
+微软只提供每个产品的最新功能更新（Windows 11 **25H2**、Windows 10 **22H2**）。
+消费者 ISO 为**多版本**，Windows 10 和 Windows 11 x64/Arm64 均提供 38 种语言。
 
 也接受以下别名：`win11`、`win11-x64`、`win11-arm64`、`amd64`、`aarch64`、`cn-home`、`cn-pro`。
 
@@ -110,9 +113,9 @@ wisodown --edition x64 --list-languages
 
 ```
 Available languages:
-  Arabic                         (id: 1234, file: Win11_24H2_Arabic_x64.iso)
-  English                        (id: 5585, file: Win11_24H2_English_x64.iso)
-  French                         (id: 5586, file: Win11_24H2_French_x64.iso)
+  Arabic                         (id: 20035, file: Win11_25H2_Arabic_x64_v2.iso)
+  English                        (id: 20046, file: Win11_25H2_English_x64_v2.iso)
+  French                         (id: 20047, file: Win11_25H2_French_x64_v2.iso)
   ...
 ```
 

@@ -16,6 +16,22 @@ Download Windows 10 and Windows 11 ISOs directly from Microsoft's servers — no
 - Progress bar with speed and ETA
 - `--url-only` mode to just print the download link
 
+## What you can download
+
+| `--edition` | Windows version | Architecture | ISO filename |
+| ----------- | --------------- | ------------ | ------------ |
+| `x64` | Windows 11 **25H2** | x64 (64-bit) | `Win11_25H2_<Lang>_x64_v2.iso` |
+| `arm64` | Windows 11 **25H2** | Arm64 | `Win11_25H2_<Lang>_Arm64_v2.iso` |
+| `win10` | Windows 10 **22H2** | x86 (32-bit) **and** x64 (64-bit) | `Win10_22H2_<Lang>_x32v1.iso` / `Win10_22H2_<Lang>_x64v1.iso` |
+| `win11-cn-home` | Windows 11 **25H2** Home (China) | — | Chinese (Simplified) only |
+| `win11-cn-pro` | Windows 11 **25H2** Pro (China) | — | Chinese (Simplified) only |
+
+- ISOs are **multi-edition** (Home/Pro/Edu/…): your product key selects the edition during installation.
+- **38 languages** are available for Windows 10/11 (x64 and Arm64).
+- Windows 11 has **no 32-bit** ISO; Windows 10 lets you choose **32-bit or 64-bit**.
+- Enterprise **LTSC / IoT** images are *not* on Microsoft's public download pages.
+- Any other product: pass its numeric `ProductEditionId` with `--edition-id`.
+
 ## Requirements
 
 - A Rust toolchain (`cargo`, stable 1.75+)
@@ -81,8 +97,10 @@ cargo build --release --target i686-pc-windows-msvc
 # binary: target\i686-pc-windows-msvc\release\wisodown.exe
 ```
 
-Supported Windows: **Windows 10 and Windows 11** — x64, ARM64 and 32-bit x86
-(`i686`). Windows 7/8.1 are not supported by current Rust toolchains.
+**Host OS** support: **Windows 10 and Windows 11** — x64, ARM64 and 32-bit x86
+(`i686`). Windows 7/8.1 are not supported by current Rust toolchains. (This is
+about *where the binary runs* — the ISOs it downloads are Windows 10/11; see
+[What you can download](#what-you-can-download).)
 
 > **Prebuilt releases:** each release ships ready-to-run archives:
 > `wisodown-linux-x86_64.zip`, `wisodown-macos-*.zip`,
@@ -97,8 +115,17 @@ Supported Windows: **Windows 10 and Windows 11** — x64, ARM64 and 32-bit x86
 | `scripts/get-iso.sh` | Linux / macOS | `bash`, `curl`, `jq` |
 | `scripts/get-iso.ps1` | Windows / Linux / macOS (PowerShell 7+) | `pwsh` |
 
-Both talk to the hosted API (`https://wiso.krnl64.win`) and can print a download
-link or download the ISO directly. On Linux the PowerShell script runs with
+Both talk to a running `wisodown-server` and can print a download link or
+download the ISO directly. They default to the public instance at
+`https://wiso.krnl64.win`; if that is unreachable, run your own server and point
+the scripts at it:
+
+```sh
+cargo run --release --features server -- --port 3000     # terminal 1
+./scripts/get-iso.sh -a http://localhost:3000 -e x64 -l English
+```
+
+On Linux the PowerShell script runs with
 [`pwsh`](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-linux):
 
 ```sh
@@ -153,11 +180,16 @@ wisodown --edition-id 2618 \
 
 ### `--edition` aliases
 
-| Value   | Description                                           |
-| ------- | ----------------------------------------------------- |
-| `x64`   | Windows 11, 64-bit (x86-64)                           |
-| `arm64` | Windows 11, ARM 64-bit                                |
-| `win10` | Windows 10, multi-edition (Home/Pro, 32-bit + 64-bit) |
+| Value   | Description                                                     |
+| ------- | -------------------------------------------------------------- |
+| `x64`   | Windows 11 25H2, 64-bit (x86-64)                                |
+| `arm64` | Windows 11 25H2, Arm64                                          |
+| `win10` | Windows 10 22H2, multi-edition (prompts 32-bit vs 64-bit)       |
+| `win11-cn-home` | Windows 11 25H2 Home (China, Chinese Simplified only)   |
+| `win11-cn-pro`  | Windows 11 25H2 Pro (China, Chinese Simplified only)    |
+
+Aliases `win11`, `win11-x64`, `win11-arm64`, `amd64`, `aarch64`, `cn-home` and
+`cn-pro` are also accepted.
 
 ### Hash verification
 

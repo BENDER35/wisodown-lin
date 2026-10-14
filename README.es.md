@@ -19,6 +19,22 @@ Microsoft: sin Media Creation Tool y sin navegador.
 - Barra de progreso con velocidad y tiempo estimado
 - Modo `--url-only` para imprimir solo el enlace de descarga
 
+## Qué puedes descargar
+
+| `--edition` | Versión de Windows | Arquitectura | Nombre del ISO |
+| ----------- | ------------------ | ------------ | -------------- |
+| `x64` | Windows 11 **25H2** | x64 (64 bits) | `Win11_25H2_<Idioma>_x64_v2.iso` |
+| `arm64` | Windows 11 **25H2** | Arm64 | `Win11_25H2_<Idioma>_Arm64_v2.iso` |
+| `win10` | Windows 10 **22H2** | x86 (32 bits) **y** x64 (64 bits) | `Win10_22H2_<Idioma>_x32v1.iso` / `Win10_22H2_<Idioma>_x64v1.iso` |
+| `win11-cn-home` | Windows 11 **25H2** Home (China) | — | solo chino simplificado |
+| `win11-cn-pro` | Windows 11 **25H2** Pro (China) | — | solo chino simplificado |
+
+- Las ISOs son **multiedición** (Home/Pro/Edu/…): la clave de producto elige la edición durante la instalación.
+- Hay **38 idiomas** para Windows 10/11 (x64 y Arm64).
+- Windows 11 **no tiene ISO de 32 bits**; Windows 10 te deja elegir **32 o 64 bits**.
+- Las imágenes **LTSC / IoT** (Enterprise) *no* están en las páginas públicas de Microsoft.
+- Cualquier otro producto: pasa su `ProductEditionId` numérico con `--edition-id`.
+
 ## Requisitos
 
 - Un entorno de Rust (`cargo`, estable 1.75+)
@@ -88,9 +104,11 @@ cargo build --release --target i686-pc-windows-msvc
 # binario: target\i686-pc-windows-msvc\release\wisodown.exe
 ```
 
-Windows soportados: **Windows 10 y Windows 11** — x64, ARM64 y x86 de 32 bits
-(`i686`). Windows 7/8.1 ya no están soportados por los toolchains actuales de
-Rust.
+Soporte de **SO anfitrión**: **Windows 10 y Windows 11** — x64, ARM64 y x86 de
+32 bits (`i686`). Windows 7/8.1 ya no están soportados por los toolchains
+actuales de Rust. (Esto se refiere a *dónde se ejecuta el binario* — las ISOs que
+descarga son de Windows 10/11; ver
+[Qué puedes descargar](#qué-puedes-descargar).)
 
 > **Releases precompiladas:** cada release incluye archivos listos para ejecutar:
 > `wisodown-linux-x86_64.zip`, `wisodown-macos-*.zip`,
@@ -105,9 +123,17 @@ Rust.
 | `scripts/get-iso.sh` | Linux / macOS | `bash`, `curl`, `jq` |
 | `scripts/get-iso.ps1` | Windows / Linux / macOS (PowerShell 7+) | `pwsh` |
 
-Ambos usan la API alojada (`https://wiso.krnl64.win`) y pueden imprimir un enlace
-de descarga o descargar la ISO directamente. En Linux el script de PowerShell se
-ejecuta con
+Ambos se comunican con un `wisodown-server` en ejecución y pueden imprimir un
+enlace de descarga o descargar la ISO directamente. Por defecto apuntan a la
+instancia pública `https://wiso.krnl64.win`; si no está accesible, levanta tu
+propio servidor y apunta los scripts a él:
+
+```sh
+cargo run --release --features server -- --port 3000     # terminal 1
+./scripts/get-iso.sh -a http://localhost:3000 -e x64 -l English
+```
+
+En Linux el script de PowerShell se ejecuta con
 [`pwsh`](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-linux):
 
 ```sh
@@ -162,11 +188,16 @@ wisodown --edition-id 2618 \
 
 ### Alias de `--edition`
 
-| Valor   | Descripción                                              |
-| ------- | -------------------------------------------------------- |
-| `x64`   | Windows 11, 64 bits (x86-64)                             |
-| `arm64` | Windows 11, ARM 64 bits                                  |
-| `win10` | Windows 10, multiedición (Home/Pro, 32 + 64 bits)        |
+| Valor   | Descripción                                                     |
+| ------- | --------------------------------------------------------------- |
+| `x64`   | Windows 11 25H2, 64 bits (x86-64)                               |
+| `arm64` | Windows 11 25H2, Arm64                                          |
+| `win10` | Windows 10 22H2, multiedición (pregunta 32 vs 64 bits)          |
+| `win11-cn-home` | Windows 11 25H2 Home (China, solo chino simplificado)    |
+| `win11-cn-pro`  | Windows 11 25H2 Pro (China, solo chino simplificado)     |
+
+También se aceptan los alias `win11`, `win11-x64`, `win11-arm64`, `amd64`,
+`aarch64`, `cn-home` y `cn-pro`.
 
 ### Verificación de hash
 

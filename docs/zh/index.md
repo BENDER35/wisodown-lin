@@ -7,8 +7,8 @@ hero:
   tagline: 直接从微软 CDN 下载 Windows 10 和 Windows 11 ISO 镜像，自动进行 SHA-256 校验。
   actions:
     - theme: brand
-      text: 在线下载
-      link: https://wiso.krnl64.win
+      text: 下载
+      link: https://github.com/BENDER35/wisodown-lin/releases/latest
     - theme: alt
       text: 快速开始
       link: /zh/guide/quick-start
