@@ -1,5 +1,7 @@
 # Windows ISO Downloader
 
+**English** · [Español](README.es.md)
+
 Download Windows 10 and Windows 11 ISOs directly from Microsoft's servers — no Media Creation Tool, no browser required.
 
 ## Features
@@ -54,6 +56,33 @@ SQLite):
 cargo build --release --features server
 # binary: target/release/wisodown-server
 ```
+
+### Building on Windows
+
+The tool builds natively on Windows too:
+
+1. Install Rust from <https://rustup.rs> (`rustup-init.exe`). The installer uses
+   the MSVC toolchain by default (requires the Visual Studio C++ Build Tools).
+2. Build:
+
+```powershell
+git clone https://github.com/BENDER35/wisodown-lin
+cd wisodown-lin
+cargo build --release
+# binary: target\release\wisodown.exe
+
+# with the optional server (needs the C compiler for bundled SQLite):
+cargo build --release --features server
+# binary: target\release\wisodown-server.exe
+```
+
+Supported Windows: **Windows 10 and Windows 11** (x64 and ARM64). Windows 7/8.1
+are not supported by current Rust toolchains.
+
+> **Prebuilt releases:** the `v0.1.3` release currently ships Linux binaries
+> only. On Windows you can build from source, or use the helper script
+> `scripts/get-iso.ps1` (no compilation needed), or run the program/server
+> wherever you prefer.
 
 ### Helper scripts
 
@@ -177,6 +206,11 @@ Prints all API requests, responses, and cookie exchange steps to stderr.
 3. Calls `getSkuInformationByProductEdition` to list available language SKUs
 4. Calls `GetProductDownloadLinksBySku` to get a time-limited CDN link
 5. Streams the ISO to disk, computing SHA-256 on the fly, with a progress bar
+
+## Documentation
+
+- [Technical reference (English)](docs/guide/technical.md)
+- [Referencia técnica (Español)](docs/guide/technical.es.md)
 
 ## License
 
