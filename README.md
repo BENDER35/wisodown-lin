@@ -116,13 +116,13 @@ about *where the binary runs* — the ISOs it downloads are Windows 10/11; see
 | `scripts/get-iso.ps1` | Windows / Linux / macOS (PowerShell 7+) | `pwsh` |
 
 Both talk to a running `wisodown-server` and can print a download link or
-download the ISO directly. They default to the public instance at
-`https://wiso.krnl64.win`; if that is unreachable, run your own server and point
-the scripts at it:
+download the ISO directly. They default to `http://localhost:3000` (override with
+`-a <url>` / `WISODOWN_API=<url>` for bash, `-ApiBase <url>` / `WISODOWN_API=<url>`
+for PowerShell), so start a server first:
 
 ```sh
 cargo run --release --features server -- --port 3000     # terminal 1
-./scripts/get-iso.sh -a http://localhost:3000 -e x64 -l English
+./scripts/get-iso.sh -e x64 -l English                   # terminal 2
 ```
 
 On Linux the PowerShell script runs with

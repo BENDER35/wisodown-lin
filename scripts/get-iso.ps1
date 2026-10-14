@@ -4,8 +4,9 @@
     Download a Windows ISO link using the wisodown API.
 
 .DESCRIPTION
-    Interactive script that uses the wisodown API (wiso.krnl64.win) to
-    generate a direct download link for a Windows ISO from Microsoft.
+    Interactive script that uses the wisodown API (defaults to a local server
+    on http://localhost:3000) to generate a direct download link for a Windows
+    ISO from Microsoft.
 
     Runs on Windows PowerShell 5.1+ and on PowerShell 7+ (pwsh) on Linux and
     macOS. On Linux/macOS, make it executable and run it directly, or invoke
@@ -17,7 +18,8 @@
         pwsh ./get-iso.ps1 -Edition x64 -Language English -Download
 
 .PARAMETER ApiBase
-    Base URL of the wisodown API. Defaults to https://wiso.krnl64.win
+    Base URL of the wisodown API. Defaults to $env:WISODOWN_API, or
+    http://localhost:3000 when that is not set.
 
 .PARAMETER Edition
     Edition alias: x64, arm64, win10, win11-cn-home, win11-cn-pro.
@@ -36,7 +38,7 @@
 #>
 [CmdletBinding()]
 param(
-    [string]$ApiBase = "https://wiso.krnl64.win",
+    [string]$ApiBase = $(if ($env:WISODOWN_API) { $env:WISODOWN_API } else { "http://localhost:3000" }),
     [string]$Edition,
     [string]$Language,
     [switch]$Download
@@ -49,6 +51,12 @@ $ProgressPreference = "SilentlyContinue"
 function Write-Step($msg) { Write-Host "-> $msg" -ForegroundColor Cyan }
 function Write-Ok($msg) { Write-Host "[OK] $msg" -ForegroundColor Green }
 function Write-Err($msg) { Write-Host "[ERROR] $msg" -ForegroundColor Red }
+
+function Show-ApiHint {
+    Write-Host "        Start a local server:" -ForegroundColor Red
+    Write-Host "          cargo run --release --features server -- --port 3000" -ForegroundColor Red
+    Write-Host "        or point elsewhere with -ApiBase <url> / WISODOWN_API=<url>." -ForegroundColor Red
+}
 
 # Reads and validates an integer in [$min, $max]. Works the same on every
 # platform (previous versions compared raw strings, which behaved oddly).
@@ -92,6 +100,7 @@ try {
     $skus = @(Invoke-RestMethod -Uri "$ApiBase/api/skus?edition=$([uri]::EscapeDataString($Edition))")
 } catch {
     Write-Err "Request failed: $($_.Exception.Message)"
+    Show-ApiHint
     exit 1
 }
 if ($skus.Count -eq 1 -and $skus[0].PSObject.Properties['error']) {
@@ -117,6 +126,7 @@ try {
     $links = Invoke-RestMethod -Uri "$ApiBase/api/links?edition=$([uri]::EscapeDataString($Edition))&language=$langEncoded"
 } catch {
     Write-Err "Request failed: $($_.Exception.Message)"
+    Show-ApiHint
     exit 1
 }
 if ($links.PSObject.Properties['error']) {

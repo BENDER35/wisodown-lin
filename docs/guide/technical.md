@@ -232,7 +232,9 @@ Build verified on Linux x86-64 (produces a native
 
 ### `scripts/get-iso.sh` (Linux / macOS)
 
-Bash script against the hosted API. Requires `curl` and `jq`.
+Bash script that talks to a `wisodown-server`. Requires `curl` and `jq`. It
+defaults to `http://localhost:3000`; override with `-a <url>` or
+`WISODOWN_API=<url>`.
 
 ```sh
 ./scripts/get-iso.sh -e x64 -l English          # print link

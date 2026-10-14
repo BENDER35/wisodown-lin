@@ -235,7 +235,9 @@ Compilación verificada en Linux x86-64 (genera un
 
 ### `scripts/get-iso.sh` (Linux / macOS)
 
-Script Bash contra la API alojada. Requiere `curl` y `jq`.
+Script Bash que habla con un `wisodown-server`. Requiere `curl` y `jq`. Por
+defecto usa `http://localhost:3000`; cámbialo con `-a <url>` o
+`WISODOWN_API=<url>`.
 
 ```sh
 ./scripts/get-iso.sh -e x64 -l English          # imprime el enlace

@@ -8,14 +8,15 @@
 #   ./get-iso.sh -e arm64 -l Japanese -d       # download directly
 #
 # Options:
-#   -a URL     API base URL (default: https://wiso.krnl64.win)
+#   -a URL     API base URL (default: $WISODOWN_API or http://localhost:3000)
 #   -e EDITION Edition: x64, arm64, win10, win11-cn-home, win11-cn-pro
 #   -l LANG    Language name (e.g. English, French)
 #   -d         Download the ISO instead of just printing the link
 
 set -euo pipefail
 
-API_BASE="https://wiso.krnl64.win"
+# API base URL: -a flag wins, then $WISODOWN_API, then a local server.
+API_BASE="${WISODOWN_API:-http://localhost:3000}"
 EDITION=""
 LANGUAGE=""
 DO_DOWNLOAD=false
@@ -48,6 +49,27 @@ red()   { printf '\033[31m%s\033[0m\n' "$*"; }
 dim()   { printf '\033[2m%s\033[0m\n' "$*"; }
 bold()  { printf '\033[1m%s\033[0m\n' "$*"; }
 
+# GET a JSON endpoint, storing the body in $API_OUT. Fails with a helpful
+# message (and exits the script) if the API cannot be reached or errors out.
+api_get() {
+    local body status err
+    if ! body=$(curl -s -w $'\n%{http_code}' "$1"); then
+        red "[ERROR] Could not reach the API at $API_BASE" >&2
+        red "        Start a local server:" >&2
+        red "          cargo run --release --features server -- --port 3000" >&2
+        red "        or point elsewhere with -a <url> / WISODOWN_API=<url>." >&2
+        exit 1
+    fi
+    status=${body##*$'\n'}
+    body=${body%$'\n'*}
+    if [[ "$status" != "200" ]]; then
+        err=$(printf '%s' "$body" | jq -r '.error // empty' 2>/dev/null || true)
+        red "[ERROR] API returned HTTP $status${err:+: $err}" >&2
+        exit 1
+    fi
+    API_OUT="$body"
+}
+
 # ── 1. Select edition ────────────────────────────────────────────────────────
 
 editions=("x64" "arm64" "win10" "win11-cn-home" "win11-cn-pro")
@@ -74,7 +96,8 @@ fi
 # ── 2. Fetch languages ───────────────────────────────────────────────────────
 
 cyan "-> Fetching languages for '$EDITION'..."
-skus_json=$(curl -sf "$API_BASE/api/skus?edition=$EDITION")
+api_get "$API_BASE/api/skus?edition=$EDITION"
+skus_json="$API_OUT"
 
 if echo "$skus_json" | jq -e '.error' &>/dev/null; then
     red "[ERROR] $(echo "$skus_json" | jq -r '.error')"
@@ -103,7 +126,8 @@ fi
 # ── 3. Get download links ────────────────────────────────────────────────────
 
 cyan "-> Generating download link..."
-links_json=$(curl -sf "$API_BASE/api/links?edition=$EDITION&language=$(printf '%s' "$LANGUAGE" | jq -sRr @uri)")
+api_get "$API_BASE/api/links?edition=$EDITION&language=$(printf '%s' "$LANGUAGE" | jq -sRr @uri)"
+links_json="$API_OUT"
 
 if echo "$links_json" | jq -e '.error' &>/dev/null; then
     red "[ERROR] $(echo "$links_json" | jq -r '.error')"

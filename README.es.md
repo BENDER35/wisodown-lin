@@ -124,13 +124,14 @@ descarga son de Windows 10/11; ver
 | `scripts/get-iso.ps1` | Windows / Linux / macOS (PowerShell 7+) | `pwsh` |
 
 Ambos se comunican con un `wisodown-server` en ejecución y pueden imprimir un
-enlace de descarga o descargar la ISO directamente. Por defecto apuntan a la
-instancia pública `https://wiso.krnl64.win`; si no está accesible, levanta tu
-propio servidor y apunta los scripts a él:
+enlace de descarga o descargar la ISO directamente. Por defecto usan
+`http://localhost:3000` (puedes cambiarlo con `-a <url>` / `WISODOWN_API=<url>` en
+bash, o `-ApiBase <url>` / `WISODOWN_API=<url>` en PowerShell), así que levanta
+primero un servidor:
 
 ```sh
 cargo run --release --features server -- --port 3000     # terminal 1
-./scripts/get-iso.sh -a http://localhost:3000 -e x64 -l English
+./scripts/get-iso.sh -e x64 -l English                   # terminal 2
 ```
 
 En Linux el script de PowerShell se ejecuta con
